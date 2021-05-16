@@ -99,8 +99,6 @@
 		2A72902B264C64BE002EBD10 = {
 			isa = PBXGroup;
 			children = (
-				2AEC796126515ED500245120 /* Helpers */,
-				2AE7164026501C3D000A150C /* Model */,
 				2A729036264C64BE002EBD10 /* RemindersApp */,
 				2A72904D264C64C0002EBD10 /* RemindersAppTests */,
 				2A729058264C64C1002EBD10 /* RemindersAppUITests */,
@@ -121,6 +119,8 @@
 		2A729036264C64BE002EBD10 /* RemindersApp */ = {
 			isa = PBXGroup;
 			children = (
+				2AEC796126515ED500245120 /* Helpers */,
+				2AE7164026501C3D000A150C /* Model */,
 				2AE7163F26501C2C000A150C /* Cells */,
 				2AE7163E26501C13000A150C /* Controllers */,
 				2A729037264C64BE002EBD10 /* AppDelegate.swift */,
