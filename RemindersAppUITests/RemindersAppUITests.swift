@@ -2,7 +2,6 @@
 //  RemindersAppUITests.swift
 //  RemindersAppUITests
 //
-//  Created by semra on 12.05.2021.
 //  Copyright © 2021 semra. All rights reserved.
 //
 
