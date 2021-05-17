@@ -9,69 +9,46 @@ import UIKit
 
 class SearchViewController: UIViewController {
 
-    @IBOutlet var searchBar: UISearchBar!
+    @IBOutlet weak var tableView: UITableView!
+    var items: [ReminderItem]!
+    
+    private var filteredItems: [ReminderItem] = []
+    weak var searchViewDelegate: SearchViewDelegate?
+    /* @IBOutlet var searchBar: UISearchBar!*/
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.titleView = searchBar
-        searchBar.delegate = self;
-
-
-        // Do any additional setup after loading the view.
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        
+        
     }
-    override func viewWillAppear(_ animated: Bool) {
+   override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationItem.hidesBackButton = true
-        searchBar.becomeFirstResponder()
-        searchBar.setShowsCancelButton(true, animated: true)
-        searchBar.showsCancelButton = true
+        items = searchViewDelegate?.getReminderItems()
+    
     }
-    /*override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
+   
+extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
+
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return filteredItems.count
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
-    }*/
-   /* let searchBar = UISearchBar()
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        setUpNavBar()
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
+        cell.textLabel!.text = filteredItems[indexPath.row].title
+        return cell
     }
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        searchBar.becomeFirstResponder()
-    }
-    func setUpNavBar() {
-        searchBar.sizeToFit()
-        searchBar.searchBarStyle = .minimal
-        searchBar.placeholder = "Search by "
-        searchBar.tintColor = UIColor.lightGray
-        searchBar.barTintColor = UIColor.lightGray
-        navigationItem.titleView = searchBar
-        searchBar.isTranslucent = true
-    }*/
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 
-extension SearchViewController: UISearchBarDelegate {
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        /*searchBar.text = ""
-        searchBar.showsCancelButton = false
-        searchBar.resignFirstResponder()*/
-          self.navigationController?.popViewController(animated: false)
+extension SearchViewController: UISearchResultsUpdating {
+
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text, searchText.count > 0 else { return }
+        filteredItems = items.filter { $0.title.range(of: searchText) != nil }
+        print(items)
+        print(filteredItems)
+       // print("update search results for \(searchText) - items are now: \(filteredItems)")
+        tableView.reloadData()
     }
-    
 }
