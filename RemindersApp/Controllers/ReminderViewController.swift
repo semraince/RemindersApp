@@ -79,7 +79,7 @@ class ReminderViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
         listTypeText.text = reminderDelegate?.getListItems()[0].name;
-        labelColor.tintColor = uiColorFromHex(rgbValue: reminderDelegate?.getListItems()[0].colorCode ?? 0)
+        labelColor.tintColor = uiColorFromHex(rgbValue: Int(reminderDelegate!.getListItems()[0].colorCode))
         priorityText.text = priorities[priorityId].key
         listItemId = reminderDelegate?.getListItems()[0].id
         
@@ -126,7 +126,8 @@ class ReminderViewController: UIViewController {
     
     @objc func onDoneButtonTapped() {
         listTypeText.text = reminderDelegate?.getListItems()[pickerList.selectedRow(inComponent: 0)].name
-        labelColor.tintColor = uiColorFromHex(rgbValue: reminderDelegate?.getListItems()[pickerList.selectedRow(inComponent: 0)].colorCode ?? 0 )
+       // let rgbValue: Int16 =
+        labelColor.tintColor = uiColorFromHex(rgbValue: Int(reminderDelegate!.getListItems()[pickerList.selectedRow(inComponent: 0)].colorCode))
         listItemId = reminderDelegate?.getListItems()[pickerList.selectedRow(inComponent: 0)].id
         toolBarList.removeFromSuperview()
         pickerList.removeFromSuperview()
@@ -149,7 +150,7 @@ class ReminderViewController: UIViewController {
         index = IndexPath(row: 1, section: 0);
         let notesText = (editTextTable.cellForRow(at: index) as! NewReminderCell).editText.text ?? "";
         let flag = switchFlag.isOn;
-        let reminderItem = ReminderItem(title: titleText, notes: notesText, flag: flag, priority: priorityId, listItemId: listItemId!)
+        let reminderItem = ReminderItemDTO(title: titleText, notes: notesText, flag: flag, priority: priorityId, listItemId: listItemId!)
         reminderDelegate?.addListItem(item: reminderItem)
         dismiss(animated: true, completion: nil);
         

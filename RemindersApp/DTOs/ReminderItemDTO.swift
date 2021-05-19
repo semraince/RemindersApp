@@ -1,5 +1,5 @@
 //
-//  ReminderItem.swift
+//  ReminderItemDTO.swift
 //  RemindersApp
 //
 //  Copyright © 2021 semra. All rights reserved.
@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct ReminderItem: Codable {
+import Foundation
+
+struct ReminderItemDTO {
     let id: String
     let title: String
     var notes: String
@@ -27,4 +29,3 @@ struct ReminderItem: Codable {
     }
     
 }
-

@@ -49,7 +49,7 @@ class ListViewController: UIViewController {
         let name = listNameTextField.text!;
         let colorIndex = colorViewController.indexPathsForSelectedItems?.first?.row ?? 0
         let listTypeIndex = listTypeViewController.indexPathsForSelectedItems?.first?.row ?? 0
-        let listItem = ListItem(name: name, colorCode: colorArray[colorIndex] , listImage: listTypes[listTypeIndex]);
+        let listItem = ListItemDTO(name: name, colorCode: colorArray[colorIndex] , listImage: listTypes[listTypeIndex]);
         listViewDelegate?.addNewList(listItem: listItem)
         dismiss(animated: true, completion: nil);
         

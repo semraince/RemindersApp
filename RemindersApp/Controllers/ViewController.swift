@@ -6,17 +6,19 @@
 //
 
 import UIKit
+import CoreData
 
 protocol ListUpdateControllerDelagate: class {
-    func addNewList(listItem: ListItem);
+    func addNewList(listItem: ListItemDTO);
 }
 
 protocol ReminderUpdateControllerDelegate: class {
     func getListItems() -> [ListItem];
-    func addListItem(item: ReminderItem);
+    func addListItem(item: ReminderItemDTO);
 }
 protocol SearchViewDelegate: class {
     func getReminderItems() -> [ReminderItem];
+    func getListItems() -> [ListItem];
 }
 
 class ViewController: UIViewController, ListUpdateControllerDelagate, ReminderUpdateControllerDelegate, SearchViewDelegate {
@@ -37,6 +39,7 @@ class ViewController: UIViewController, ListUpdateControllerDelagate, ReminderUp
     var listItems: [ListItem] = []
     var reminderItems: [ReminderItem] = []
     var searchController : UISearchController!//(searchResultsController: SearchViewController());
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -62,13 +65,13 @@ class ViewController: UIViewController, ListUpdateControllerDelagate, ReminderUp
         searchController.searchResultsUpdater = searchViewController
         searchController.dimsBackgroundDuringPresentation = true
         searchController.definesPresentationContext = true
-       /* searchBar.sizeToFit()
-        navigationItem.titleView = searchBar*/
+        
 
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
+        updateView();
     }
     
     
@@ -103,23 +106,63 @@ class ViewController: UIViewController, ListUpdateControllerDelagate, ReminderUp
         
     }
     
-    func addNewList(listItem: ListItem) {
-        listItems.append(listItem);
+    func addNewList(listItem: ListItemDTO) {
+        //listItems.append(listItem);
+        createNewList(listItem: listItem);
         updateView()
     }
-    
+    func createNewList(listItem: ListItemDTO){
+        let listItemModel = ListItem(context: context);
+        listItemModel.colorCode = Int32(listItem.colorCode);
+        listItemModel.id = listItem.id;
+        listItemModel.name = listItem.name
+        listItemModel.listImage = listItem.listImage
+        do {
+            try context.save()
+        }
+        catch{
+        }
+                          
+    }
     func getListItems() -> [ListItem]{
         return listItems;
     }
     
-    func addListItem(item: ReminderItem){
-        reminderItems.append(item);
+    func addListItem(item: ReminderItemDTO){
+        createReminderItem(item: item)
         updateView();
+    }
+    func createReminderItem(item: ReminderItemDTO){
+        let reminderModel = ReminderItem(context: context);
+        reminderModel.flag = item.flag;
+        reminderModel.id = item.id;
+        reminderModel.listItemId = item.listItemId;
+        reminderModel.notes = item.notes;
+        reminderModel.status = Int32(item.status)
+        reminderModel.priority = Int32(item.priority)
+        reminderModel.title = item.title;
+        do {
+            try context.save()
+        }
+        catch{
+        }
+        
     }
     
     func updateView(){
-        updateLabels();
-        listTable.reloadData();
+        do {
+            
+            try listItems = context.fetch(ListItem.fetchRequest())
+            try reminderItems = context.fetch(ReminderItem.fetchRequest());
+            DispatchQueue.main.async {
+                self.updateLabels();
+                self.listTable.reloadData();
+            }
+        }
+        catch {
+                
+        }
+        
     }
     func updateLabels(){
         numberOfReminders.text = String(reminderItems.count)
@@ -136,6 +179,26 @@ class ViewController: UIViewController, ListUpdateControllerDelagate, ReminderUp
     func getReminderItems() -> [ReminderItem] {
         return reminderItems;
     }
+    
+    func deleteAllData(entity: String)
+    {
+       
+        let managedContext = context
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+        fetchRequest.returnsObjectsAsFaults = false
+
+        do
+        {
+            let results = try managedContext.fetch(fetchRequest)
+            for managedObject in results
+            {
+                let managedObjectData:NSManagedObject = managedObject as! NSManagedObject
+                managedContext.delete(managedObjectData)
+            }
+        } catch let error as NSError {
+            print("Detele all data in \(entity) error : \(error) \(error.userInfo)")
+        }
+    }
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
@@ -151,7 +214,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                 reminderCounts += 1 ;
             }
         }
-        cell.configure(name: listItem.name, imageName: listItem.listImage, imageColor: uiColorFromHex(rgbValue: listItem.colorCode),  reminderCount: reminderCounts)
+        print("id of ", listItem.name, " is" , listItem.id)
+        cell.configure(name: listItem.name!, imageName: listItem.listImage!, imageColor: uiColorFromHex(rgbValue: Int(listItem.colorCode)),  reminderCount: reminderCounts)
         cell.selectionStyle = .none;
            
         return cell;
